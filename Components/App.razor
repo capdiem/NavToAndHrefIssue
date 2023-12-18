@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="NavToAndHrefIssue.styles.css" />
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+    <script src="_framework/blazor.web.js"></script>
+    <script>   
+    class OutsideClick {
+      dotnetHelper;
+      excludedElements;
+      listener;
+
+      constructor(dotnetHelper, excludedElements) {
+        this.dotnetHelper = dotnetHelper;
+        this.excludedElements = excludedElements;
+        console.log(this.excludedElements)
+        
+        this.listener = (e) => {
+          console.log('listenr', this.excludedElements)
+          if(this.excludedElements.some(selector => {
+            const el = document.querySelector(selector);
+            return el && el.contains(e.target);
+          }))
+            return;
+
+          this.dotnetHelper.invokeMethodAsync('OutsideClick');
+        };
+        document.addEventListener('click', this.listener, true  );
+      }
+      
+      unbind() {
+        document.removeEventListener('click', this.listener, true );
+      }
+    }
+    
+    window.registerOutsideClick = (dotnetHelper, excludedElements) => {
+      const outsideClick = new OutsideClick(dotnetHelper, excludedElements);
+      console.log('outsideClick.excludedElements', outsideClick.excludedElements)
+      return outsideClick;
+    };
+    </script>
+</body>
+
+</html>

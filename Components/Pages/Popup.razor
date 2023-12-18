@@ -1,0 +1,43 @@
+﻿@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+
+<div id="@Id" style="border: 1px solid lightgrey; padding: 8px;">@Content</div>
+
+@code {
+
+    [Parameter] public string? Id { get; set; }
+
+    [Parameter] public string? Content { get; set; }
+
+    [Parameter] public int DelayAfterOutsideClick { get; set; }
+
+    private IJSObjectReference _jsObjectReference;
+    private DotNetObjectReference<Popup> dotNetObjectReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        dotNetObjectReference = DotNetObjectReference.Create(this);
+
+        if (firstRender)
+        {
+            _jsObjectReference = await JSRuntime.InvokeAsync<IJSObjectReference>("registerOutsideClick", dotNetObjectReference, new[] { Id! });
+        }
+    }
+
+    [JSInvokable]
+    public async Task OutsideClick()
+    {
+        await Task.Delay(DelayAfterOutsideClick);
+        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter(Id, (bool?)null));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        dotNetObjectReference.Dispose();
+        _ = _jsObjectReference.InvokeVoidAsync("unbind");
+        await _jsObjectReference.DisposeAsync();
+    }
+
+}

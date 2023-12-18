@@ -1,0 +1,72 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+<h3>Delay 0ms after outside click(click another link)</h3>
+<div style="display: flex">
+    <InteractiveTrigger QueryName="@nameof(Cart)"
+                        QueryValue="Cart"
+                        InteractiveValue="true"
+                        InteractiveComponentType="@typeof(Popup)"
+                        InteractiveComponentParameters="@(GenPopupParameters("cart", "Cart popup", 0))">
+        <b>[Show cart]</b>
+    </InteractiveTrigger>
+
+    <InteractiveTrigger QueryName="@nameof(Chat)"
+                        QueryValue="Chat"
+                        InteractiveValue="true"
+                        InteractiveComponentType="@typeof(Popup)"
+                        InteractiveComponentParameters="@(GenPopupParameters("chat", "Chat popup", 0))">
+        <b>[Show chat]</b>
+    </InteractiveTrigger>
+</div>
+
+<div style="margin-top: 100px;">
+    <h3>Delay 100ms after outside click(click another link)</h3>
+    <div style="display: flex;">
+        <InteractiveTrigger QueryName="@nameof(Cart2)"
+                            QueryValue="Cart2"
+                            InteractiveValue="true"
+                            InteractiveComponentType="@typeof(Popup)"
+                            InteractiveComponentParameters="@(GenPopupParameters("cart2", "Cart2 popup", 100))">
+            <b>[Show cart]</b>
+        </InteractiveTrigger>
+
+        <InteractiveTrigger QueryName="@nameof(Chat2)"
+                            QueryValue="Chat2"
+                            InteractiveValue="true"
+                            InteractiveComponentType="@typeof(Popup)"
+                            InteractiveComponentParameters="@(GenPopupParameters("chat2", "Chat2 popup", 100))">
+            <b>[Show chat]</b>
+        </InteractiveTrigger>
+    </div>
+</div>
+
+@code {
+
+    [SupplyParameterFromQuery]
+    private bool? Cart { get; set; }
+
+    [SupplyParameterFromQuery]
+    private bool? Chat { get; set; }
+
+    [SupplyParameterFromQuery]
+    private bool? Cart2 { get; set; }
+
+    [SupplyParameterFromQuery]
+    private bool? Chat2 { get; set; }
+
+    private Dictionary<string, object?> GenPopupParameters(string id, string content, int delayAfterOutsideClick)
+    {
+        return new Dictionary<string, object?>()
+        {
+            { nameof(Popup.Id), id },
+            { nameof(Popup.Content), content },
+            { nameof(Popup.DelayAfterOutsideClick), delayAfterOutsideClick }
+        };
+    }
+
+}

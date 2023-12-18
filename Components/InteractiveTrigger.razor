@@ -1,0 +1,49 @@
+﻿@typeparam TValue
+@inject NavigationManager NavigationManager
+
+<div style="position: relative">
+    <a style="@LinkStyle"
+       href="@NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>() { { QueryName, isInteractive ? default : InteractiveValue } })">
+        @ChildContent
+    </a>
+
+    <div style="position: absolute; @PopupStyle">
+        @if (isInteractive)
+        {
+            <DynamicComponent Type="InteractiveComponentType"
+                              Parameters="InteractiveComponentParameters">
+            </DynamicComponent>
+        }
+    </div>
+</div>
+
+@code {
+
+    [Parameter] [EditorRequired] public string QueryName { get; set; } = null!;
+
+    [Parameter] public TValue? QueryValue { get; set; }
+
+    [Parameter] [EditorRequired] public TValue InteractiveValue { get; set; } = default!;
+
+    [Parameter] [EditorRequired] public Type InteractiveComponentType { get; set; } = null!;
+
+    [Parameter] public IDictionary<string, object?>? InteractiveComponentParameters { get; set; }
+
+    [Parameter] public string? PopupStyle { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public string? Style { get; set; }
+
+    [Parameter] public string? LinkStyle { get; set; }
+
+    private bool isInteractive;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        isInteractive = EqualityComparer<TValue>.Default.Equals(QueryValue, InteractiveValue);
+    }
+
+}
