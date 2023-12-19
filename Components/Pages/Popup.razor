@@ -13,16 +13,16 @@
 
     [Parameter] public int DelayAfterOutsideClick { get; set; }
 
-    private IJSObjectReference _jsObjectReference;
-    private DotNetObjectReference<Popup> dotNetObjectReference;
+    private IJSObjectReference? _jsObjectReference;
+    private DotNetObjectReference<Popup>? _dotNetObjectReference;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        dotNetObjectReference = DotNetObjectReference.Create(this);
+        _dotNetObjectReference = DotNetObjectReference.Create(this);
 
         if (firstRender)
         {
-            _jsObjectReference = await JSRuntime.InvokeAsync<IJSObjectReference>("registerOutsideClick", dotNetObjectReference, new[] { Id! });
+            _jsObjectReference = await JSRuntime.InvokeAsync<IJSObjectReference>("registerOutsideClick", _dotNetObjectReference, new[] { Id! });
         }
     }
 
@@ -35,9 +35,12 @@
 
     public async ValueTask DisposeAsync()
     {
-        dotNetObjectReference.Dispose();
-        _ = _jsObjectReference.InvokeVoidAsync("unbind");
-        await _jsObjectReference.DisposeAsync();
+        _dotNetObjectReference?.Dispose();
+        if (_jsObjectReference != null)
+        {
+            _ = _jsObjectReference.InvokeVoidAsync("unbind");
+            await _jsObjectReference.DisposeAsync();
+        }
     }
 
 }
